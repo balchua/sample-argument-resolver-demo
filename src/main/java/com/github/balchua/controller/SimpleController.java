@@ -1,9 +1,8 @@
-package com.github.balchua.workflowdemo.controller;
+package com.github.balchua.controller;
 
-import com.github.balchua.workflowdemo.argumenthandler.UiProxy;
+import com.github.balchua.argumenthandler.UiProxy;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
 
