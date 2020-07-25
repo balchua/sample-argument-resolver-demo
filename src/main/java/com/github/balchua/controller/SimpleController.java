@@ -2,9 +2,11 @@ package com.github.balchua.controller;
 
 import com.github.balchua.argumenthandler.UiProxy;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 
 import java.security.Principal;
 
@@ -12,10 +14,12 @@ import java.security.Principal;
 @Slf4j
 public class SimpleController {
 
+    @Autowired
+    private RestTemplate restTemplate;
+
     @GetMapping("/proxied")
     public ResponseEntity<String> proxied(UiProxy proxy, Principal principal) {
-        log.debug(principal.getName());
-        return proxy.uri("http://localhost:8080", "/simple");
+        return proxy.uri( restTemplate, "http://localhost:8080", "/simple");
     }
 
     /*

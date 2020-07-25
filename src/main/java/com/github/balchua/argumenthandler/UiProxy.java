@@ -14,19 +14,20 @@ import java.net.URI;
 @Data
 @Slf4j
 public class UiProxy {
-    HttpEntity<String> httpEntity;
-    HttpMethod httpMethod;
-    MultiValueMap parameters;
+    private HttpEntity<String> httpEntity;
+    private HttpMethod httpMethod;
+    private MultiValueMap parameters;
 
-    public ResponseEntity<String> uri(String baseUri, String path) {
+    public ResponseEntity<String> uri(RestTemplate restTemplate,  String baseUri, String path) {
+        if (restTemplate == null) {
+            throw new IllegalArgumentException("restTemplate cannot be null.");
+        }
         URI uri = UriComponentsBuilder
                 .fromUriString(baseUri).path(path)
                 .queryParams(parameters)
                 .encode()
                 .build()
                 .toUri();
-
-        RestTemplate restTemplate = new RestTemplate();
         return restTemplate.exchange(uri, httpMethod, httpEntity, String.class);
     }
 }
