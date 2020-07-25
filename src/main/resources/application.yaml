@@ -1,0 +1,6 @@
+logging:
+  level:
+    root: ERROR
+    org.springframework: ERROR
+    com.github.balchua: DEBUG
+    org.hibernate: ERROR
