@@ -71,7 +71,7 @@ public class SimpleControllerTest {
         ResponseEntity<String> responseEntity = ResponseEntity.created(buildUri())
                 .headers(headers)
                 .body("Hello World");
-        ;
+
         when(restTemplate.exchange(ArgumentMatchers.any(URI.class),
                 ArgumentMatchers.any(HttpMethod.class),
                 ArgumentMatchers.<HttpEntity<?>>any(),
