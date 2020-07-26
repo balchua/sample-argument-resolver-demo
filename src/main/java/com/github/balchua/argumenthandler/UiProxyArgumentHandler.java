@@ -27,7 +27,6 @@ public class UiProxyArgumentHandler implements HandlerMethodArgumentResolver {
     private MultiValueMap<String, String> convertParameter(Map<String, String[]> parameters) {
         MultiValueMap<String, String> multi = new LinkedMultiValueMap();
         parameters.forEach((k,v) -> {
-            log.debug("Key: {}, Value: {}", k, v);
             multi.add(k, v[0]);
         });
         return multi;
