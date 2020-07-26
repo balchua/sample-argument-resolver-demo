@@ -1,6 +1,9 @@
 package com.github.balchua.argumenthandler;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.Getter;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
@@ -11,17 +14,15 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
 
-@Data
+@AllArgsConstructor
+@Getter
 @Slf4j
 public class UiProxy {
     private HttpEntity<String> httpEntity;
     private HttpMethod httpMethod;
     private MultiValueMap parameters;
 
-    public ResponseEntity<String> uri(RestTemplate restTemplate,  String baseUri, String path) {
-        if (restTemplate == null) {
-            throw new IllegalArgumentException("restTemplate cannot be null.");
-        }
+    public ResponseEntity<String> uri(@NonNull RestTemplate restTemplate, String baseUri, String path) {
         URI uri = UriComponentsBuilder
                 .fromUriString(baseUri).path(path)
                 .queryParams(parameters)

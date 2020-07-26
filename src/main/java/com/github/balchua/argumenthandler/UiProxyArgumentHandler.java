@@ -44,10 +44,7 @@ public class UiProxyArgumentHandler implements HandlerMethodArgumentResolver {
         });
         HttpEntity<String> entity = new HttpEntity<>(headers);
 
-        UiProxy uiProxy = new UiProxy();
-        uiProxy.setHttpEntity(entity);
-        uiProxy.setHttpMethod(HttpMethod.valueOf(request.getMethod()));
-        uiProxy.setParameters(params);
+        UiProxy uiProxy = new UiProxy(entity,HttpMethod.valueOf(request.getMethod()), params);
 
         return uiProxy;
 

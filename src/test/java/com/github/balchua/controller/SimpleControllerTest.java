@@ -2,10 +2,11 @@ package com.github.balchua.controller;
 
 import com.github.balchua.LocalTestConfiguration;
 import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.ArgumentMatchers;
-import org.mockito.Matchers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
@@ -28,7 +29,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.net.URI;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -49,6 +50,26 @@ public class SimpleControllerTest {
     @MockBean
     RestTemplate restTemplate;
 
+    private ResponseEntity<String> responseEntity;
+    private HttpHeaders headers;
+
+    @BeforeEach
+    private void initMocks() {
+        headers = new HttpHeaders();
+        headers.add("authorization", "Basic: somebase64");
+        responseEntity = ResponseEntity.created(buildUri())
+                .headers(headers)
+                .body("Hello World");
+
+        when(restTemplate.exchange(ArgumentMatchers.any(URI.class),
+                ArgumentMatchers.any(HttpMethod.class),
+                ArgumentMatchers.<HttpEntity<?>>any(),
+                ArgumentMatchers.<Class<String>>any()))
+                .thenReturn(responseEntity);
+
+    }
+
+
     private URI buildUri() {
         MultiValueMap<String, String> parameters = new LinkedMultiValueMap<>();
         parameters.add("name", "bal");
@@ -64,19 +85,7 @@ public class SimpleControllerTest {
 
     @Test
     @DisplayName("Should pass through the UiProxy, returning the mock response")
-    void verifyArgumentResolver() throws Exception {
-        HttpHeaders headers = new HttpHeaders();
-        headers.add("authorization", "Basic: somebase64");
-
-        ResponseEntity<String> responseEntity = ResponseEntity.created(buildUri())
-                .headers(headers)
-                .body("Hello World");
-
-        when(restTemplate.exchange(ArgumentMatchers.any(URI.class),
-                ArgumentMatchers.any(HttpMethod.class),
-                ArgumentMatchers.<HttpEntity<?>>any(),
-                ArgumentMatchers.<Class<String>>any()))
-                .thenReturn(responseEntity);
+    void shouldPassThroughTheUiProxy() throws Exception {
 
         MvcResult result = mockMvc.perform(MockMvcRequestBuilders.get("/proxied")
                 .param("name", "bal")
@@ -85,8 +94,36 @@ public class SimpleControllerTest {
                 .andReturn();
 
         assertThat(result.getResponse().getContentAsString()).isEqualTo("Hello World");
-        assertThat(result.getResponse().getHeader("authorization")).isEqualTo("Basic: somebase64");
+    }
 
+    @Test
+    @DisplayName("Should pass the same headers and request parameters")
+    void shouldPassTheSameHeadersAndParameters() throws Exception {
 
+        MvcResult result = mockMvc.perform(MockMvcRequestBuilders.get("/proxied")
+                .param("name", "bal")
+                .headers(headers))
+                .andExpect(status().is(201))
+                .andReturn();
+
+        ArgumentCaptor<URI> uriArgumentCaptor = ArgumentCaptor.forClass(URI.class);
+        ArgumentCaptor<HttpMethod> httpMethodArgumentCaptor = ArgumentCaptor.forClass(HttpMethod.class);
+        ArgumentCaptor<HttpEntity> httpEntityArgumentCaptor = ArgumentCaptor.forClass(HttpEntity.class);
+
+        verify(restTemplate).exchange(uriArgumentCaptor.capture()
+                , httpMethodArgumentCaptor.capture()
+                , httpEntityArgumentCaptor.capture()
+                , ArgumentMatchers.<Class<String>>any());
+
+        URI uri = uriArgumentCaptor.getValue();
+        assertThat(uri.toString()).isEqualTo("http://localhost:8080/simple?name=bal");
+
+        HttpMethod method = httpMethodArgumentCaptor.getValue();
+        assertThat(method).isEqualTo(HttpMethod.GET);
+
+        HttpEntity entity = httpEntityArgumentCaptor.getValue();
+        assertThat(entity.getHeaders()).isEqualTo(headers);
+
+        assertThat(result.getResponse().getContentAsString()).isEqualTo("Hello World");
     }
 }
