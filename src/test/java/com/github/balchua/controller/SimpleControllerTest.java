@@ -33,15 +33,10 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@SpringBootTest(classes = {LocalTestConfiguration.class},
-        properties = {
-                "security.basic.enabled=false"
-        })
+@SpringBootTest(classes = {LocalTestConfiguration.class})
 @AutoConfigureMockMvc
 @Slf4j
 @ActiveProfiles({"test"})
-@EnableAutoConfiguration(exclude = {SecurityAutoConfiguration.class})
-
 public class SimpleControllerTest {
 
     @Autowired

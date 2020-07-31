@@ -1,6 +1,14 @@
 spring:
   profiles:
     active: production
+#This portion is simply to simulate oauth2 login.
+  security:
+    oauth2:
+      client:
+        registration:
+          github:
+            clientId: github-client-id
+            clientSecret: github-client-secret
 
 logging:
   level:
