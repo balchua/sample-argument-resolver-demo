@@ -2,11 +2,10 @@ package com.github.balchua.controller;
 
 import com.github.balchua.LocalTestConfiguration;
 import lombok.extern.slf4j.Slf4j;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.mockito.ArgumentCaptor;
 import org.mockito.ArgumentMatchers;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
@@ -29,8 +28,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.net.URI;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest(classes = {LocalTestConfiguration.class})
@@ -49,13 +47,13 @@ public class SimpleControllerTest {
     private HttpHeaders headers;
 
     @BeforeEach
-    private void initMocks() {
+    private void initMocks(TestInfo info) {
+
         headers = new HttpHeaders();
         headers.add("authorization", "Basic: somebase64");
         responseEntity = ResponseEntity.created(buildUri())
                 .headers(headers)
                 .body("Hello World");
-
         when(restTemplate.exchange(ArgumentMatchers.any(URI.class),
                 ArgumentMatchers.any(HttpMethod.class),
                 ArgumentMatchers.<HttpEntity<?>>any(),
@@ -121,4 +119,6 @@ public class SimpleControllerTest {
 
         assertThat(result.getResponse().getContentAsString()).isEqualTo("Hello World");
     }
+
+
 }

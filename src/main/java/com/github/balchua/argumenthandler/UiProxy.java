@@ -15,11 +15,13 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.net.URI;
 
 @AllArgsConstructor
-@Getter
 @Slf4j
 public class UiProxy {
+    @Getter
     private HttpEntity<String> httpEntity;
+    @Getter
     private HttpMethod httpMethod;
+    @Getter
     private MultiValueMap parameters;
 
     public ResponseEntity<String> uri(@NonNull RestTemplate restTemplate, String baseUri, String path) {
